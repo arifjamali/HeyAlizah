@@ -54,6 +54,11 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
     //Logout Button
     val mLoginout: Button = findViewById (R.id.logout_customer);
 
+    //Declaring varaible for customer request
+    val mRequest: Button = findViewById (R.id.request);
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,11 +71,32 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
         getLastLocation()
 
+        //Funtion to logout customer
         mLoginout.setOnClickListener(View.OnClickListener {
             FirebaseAuth.getInstance().signOut();
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
             finish()
+        })
+
+        //Setting up Request button so custoemr can request Assistant
+        mRequest.setOnClickListener(View.OnClickListener {
+            val user = FirebaseAuth.getInstance().currentUser
+            val uid = user?.uid
+            mDatabase = FirebaseDatabase.getInstance().getReference("CustomerRequest")
+            //referencing my database where i want my GeoFire data to be
+            geofire = GeoFire(mDatabase)
+
+            //setting Customer latitude and longitude in database for pickup Request
+            geofire!!.setLocation(uid,GeoLocation(clatitude,clongtidue))
+            //Now will create marker for Pickup Location
+            val pickupLocation = LatLng(clatitude,clongtidue)
+            map.addMarker(MarkerOptions().position(pickupLocation).title("My Current Pickup Location"))
+
+            // I am changing the text of Request Assistant to Requesting your Assistant. So the customer
+            //knows that we searching for near by assistant for you
+            mRequest.setText("Requesting your Assistant, Please Wait")
+
         })
 
     }
