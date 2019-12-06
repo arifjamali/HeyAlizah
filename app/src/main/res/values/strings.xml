@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">HeyAlizah</string>
+    <string name="title_activity_assistant_map">Map</string>
+    <string name="title_activity_test">Map</string>
+    <string name="title_activity_customer_map">Map</string>
+</resources>

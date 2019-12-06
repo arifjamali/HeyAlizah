@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "754371556342",
+    "firebase_url": "https://project-9e128.firebaseio.com",
+    "project_id": "project-9e128",
+    "storage_bucket": "project-9e128.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:754371556342:android:ff245237bd7a9c7c010dd7",
+        "android_client_info": {
+          "package_name": "com.example.heyalizah"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "754371556342-slup2bf1c7p5akcu1veio7u7f00stfd8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.heyalizah",
+            "certificate_hash": "18e71b7ab9908998e6ba821bd907eac3abb4e497"
+          }
+        },
+        {
+          "client_id": "754371556342-r52qico6f8cjase5ec8bfv9ugr7ma7vu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBo5yf8lOln1jpmKbcDborMagAiqczElT4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "754371556342-r52qico6f8cjase5ec8bfv9ugr7ma7vu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
