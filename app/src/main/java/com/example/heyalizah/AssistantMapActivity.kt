@@ -51,8 +51,6 @@ class AssistantMapActivity : AppCompatActivity(), OnMapReadyCallback,
     var clongtidue = 1.0
     var clatitude = 1.0
 
-    //Logout Button
-    val mLoginout: Button = findViewById (R.id.logout_assistant);
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +63,8 @@ class AssistantMapActivity : AppCompatActivity(), OnMapReadyCallback,
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         getLastLocation()
-
+        //Logout Button
+        val mLoginout: Button = findViewById (R.id.logout_assistant);
         mLoginout.setOnClickListener(View.OnClickListener {
             FirebaseAuth.getInstance().signOut();
             val intent = Intent(this, MainActivity::class.java)
@@ -88,9 +87,7 @@ class AssistantMapActivity : AppCompatActivity(), OnMapReadyCallback,
         Toast.makeText(this, "onMapReady", Toast.LENGTH_LONG).show()
         map.uiSettings.isZoomControlsEnabled = true
         map.uiSettings.isCompassEnabled = true
-        map.setOnMarkerClickListener(this)
-
-        getLastLocation()
+        //map.setOnMarkerClickListener(this)
 
 
     }

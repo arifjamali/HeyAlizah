@@ -50,16 +50,7 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
     lateinit var mDatabase: DatabaseReference;
     var clongtidue = 1.0
     var clatitude = 1.0
-
-    //Logout Button
-    val mLoginout: Button = findViewById (R.id.logout_customer);
-
-    //Declaring varaible for customer request
-    val mRequest: Button = findViewById (R.id.request);
-
-
-
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_customer_map)
@@ -70,15 +61,16 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         getLastLocation()
-
+        //Logout Button
+        val mLoginout: Button = findViewById (R.id.logout_customer);
         //Funtion to logout customer
         mLoginout.setOnClickListener(View.OnClickListener {
             FirebaseAuth.getInstance().signOut();
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this,MainActivity::class.java))
             finish()
         })
-
+        //Declaring varaible for customer request
+        val mRequest: Button = findViewById (R.id.request);
         //Setting up Request button so custoemr can request Assistant
         mRequest.setOnClickListener(View.OnClickListener {
             val user = FirebaseAuth.getInstance().currentUser
@@ -116,8 +108,6 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
         map.uiSettings.isCompassEnabled = true
         map.setOnMarkerClickListener(this)
 
-        getLastLocation()
-
 
     }
 
@@ -145,7 +135,8 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
                         val regina = LatLng(clatitude,clongtidue)  // this is regina
-                        map.addMarker(MarkerOptions().position(regina).title("My Favorite City"))
+                        map.isMyLocationEnabled = true
+                        //map.addMarker(MarkerOptions().position(regina).title("My Favorite City"))
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(regina, 12.0f))
                         Toast.makeText(this, location.latitude.toString() + location.longitude.toString(), Toast.LENGTH_LONG).show()
 
@@ -215,12 +206,6 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
                 Toast.makeText(this, "Permission Granted", Toast.LENGTH_LONG).show()
             }
         }
-    }
-
-
-    override fun onStop() {
-        super.onStop()
-
     }
 
 }

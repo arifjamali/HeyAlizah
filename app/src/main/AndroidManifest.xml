@@ -37,20 +37,16 @@
 
         <activity
             android:name=".CustomerMapActivity"
-            android:label="@string/title_activity_customer_map"></activity>
-        <activity
-            android:name=".test"
-            android:label="@string/title_activity_test" />
+            android:label="@string/title_activity_customer_map" ></activity>
         <activity
             android:name=".AssistantMapActivity"
-            android:label="@string/title_activity_assistant_map" />
-        <activity android:name=".CustomerLoginActivity" />
-        <activity android:name=".DriverMapActivity" />
+            android:label="@string/title_activity_assistant_map" >
+        </activity>
         <activity android:name=".Main2Activity" />
+        <activity android:name=".CustomerLoginActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

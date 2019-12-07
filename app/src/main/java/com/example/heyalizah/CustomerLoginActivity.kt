@@ -14,7 +14,6 @@ import com.google.firebase.database.FirebaseDatabase
 
 class CustomerLoginActivity : AppCompatActivity() {
     /*Firebase Reference */
-    private var mDatabaseReference: DatabaseReference? = null
     lateinit var mDatabase: DatabaseReference;
     val mAuth = FirebaseAuth.getInstance();
 
@@ -31,10 +30,10 @@ class CustomerLoginActivity : AppCompatActivity() {
         val mRegistration : Button = findViewById (R.id.registration);
 
         mLogin.setOnClickListener(View.OnClickListener {
-                view -> login();
+                view->login();
         })
         mRegistration.setOnClickListener(View.OnClickListener {
-                view -> register();
+                view->register();
         })
 
 
@@ -54,10 +53,10 @@ class CustomerLoginActivity : AppCompatActivity() {
                 addOnCompleteListener(this, OnCompleteListener {
                         task ->
                     if(task.isSuccessful){
-                        startActivity(Intent(this,AssistantMapActivity::class.java))
+                        startActivity(Intent(this, CustomerMapActivity::class.java))
                         Toast.makeText(this,"Sucesslly logged in: )", Toast.LENGTH_LONG).show();
                     }else{
-                        Toast.makeText(this,"Error: (", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,"Invalid Username and Password: (", Toast.LENGTH_LONG).show();
 
                     }
                 }
@@ -86,7 +85,7 @@ class CustomerLoginActivity : AppCompatActivity() {
                         mDatabase.setValue(true);
                         Toast.makeText(this,"Successfully You are Registered: )", Toast.LENGTH_LONG).show();
                     }else{
-                        Toast.makeText(this,"Error: (", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,"This Account is already Registered", Toast.LENGTH_LONG).show();
 
                     }
                 }

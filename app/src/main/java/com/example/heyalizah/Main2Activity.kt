@@ -16,7 +16,6 @@ import java.lang.NullPointerException
 
 class Main2Activity : AppCompatActivity() {
     /*Firebase Reference */
-    private var mDatabaseReference: DatabaseReference? = null
     lateinit var mDatabase: DatabaseReference;
     val mAuth = FirebaseAuth.getInstance();
 
@@ -33,10 +32,10 @@ class Main2Activity : AppCompatActivity() {
         val mRegistration : Button = findViewById (R.id.registration);
 
         mLogin.setOnClickListener(View.OnClickListener {
-            view -> login();
+            login();
         })
         mRegistration.setOnClickListener(View.OnClickListener {
-                view -> register();
+                register();
         })
 
 
@@ -56,7 +55,8 @@ class Main2Activity : AppCompatActivity() {
                 addOnCompleteListener(this, OnCompleteListener {
                     task ->
                     if(task.isSuccessful){
-                        startActivity(Intent(this,AssistantMapActivity::class.java))
+                        startActivity(Intent(this, AssistantMapActivity::class.java))
+                        finish()
                         Toast.makeText(this,"Sucesslly logged in: )", Toast.LENGTH_LONG).show();
                      }else{
                         Toast.makeText(this,"Error Invalid Username or Password",Toast.LENGTH_LONG).show();

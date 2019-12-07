@@ -1,34 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/map"
-    android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CustomerMapActivity"
-    android:orientation="vertical">
-
-    <Button
-        android:id="@+id/settings_assistant"
-        android:layout_width="190dp"
-        android:layout_height="wrap_content"
-
-        android:background="@color/colorPrimaryDark"
-        android:text="Settings"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textColor="@android:color/background_light"
-        android:textSize="15sp"
-        android:textStyle="bold" />
-
+    tools:context=".CustomerMapActivity">
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"/>
     <Button
         android:id="@+id/logout_customer"
         android:layout_width="190dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/settings_assistant"
         android:background="@color/colorPrimaryDark"
         android:text="Logout"
         android:textAlignment="center"
@@ -36,13 +21,12 @@
         android:textColor="@android:color/background_light"
         android:textSize="15sp"
         android:textStyle="bold" />
-
     <Button
         android:id="@+id/request"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/settings_assistant"
         android:text="Request Assistant"
+        android:layout_gravity="bottom"
         android:textColor="@android:color/background_light"
         android:background="@color/colorPrimaryDark"
         android:textSize="15sp"
@@ -50,4 +34,8 @@
         android:textAlignment="center" />
 
 
-</RelativeLayout>
+
+
+
+
+</FrameLayout>
