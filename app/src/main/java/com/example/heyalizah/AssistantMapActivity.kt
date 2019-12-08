@@ -65,11 +65,19 @@ class AssistantMapActivity : AppCompatActivity(), OnMapReadyCallback,
         getLastLocation()
         //Logout Button
         val mLoginout: Button = findViewById (R.id.logout_assistant);
+        //Funtion to logout customer
         mLoginout.setOnClickListener(View.OnClickListener {
+            val userId = FirebaseAuth.getInstance().currentUser?.uid
+            mDatabase = FirebaseDatabase.getInstance().getReference("AssistantAvailable")
+            //referencing my database where i want my GeoFire data to be
+            geofire = GeoFire(mDatabase)
+
+            //removing the driver from driver avialable list because he is not longer available
+            geofire!!.removeLocation(userId)
             FirebaseAuth.getInstance().signOut();
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            startActivity(Intent(this,MainActivity::class.java))
             finish()
+
         })
 
     }
@@ -200,15 +208,8 @@ class AssistantMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
     override fun onStop() {
+
         super.onStop()
-
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        mDatabase = FirebaseDatabase.getInstance().getReference("DriverAvailable")
-        //referencing my database where i want my GeoFire data to be
-        geofire = GeoFire(mDatabase)
-
-        //removing the driver from driver avialable list because he is not longer available
-        geofire!!.removeLocation(userId)
     }
 
 }

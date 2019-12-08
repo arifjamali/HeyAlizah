@@ -3,8 +3,6 @@ package com.example.heyalizah
 import android.Manifest
 import android.content.Intent
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQuery
@@ -31,26 +29,97 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.database.*
 import com.google.protobuf.DescriptorProtos
+import com.google.protobuf.Value
+import kotlinx.android.synthetic.main.activity_main.*
+import java.util.*
+import kotlin.collections.HashMap
 
 class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
     GoogleMap.OnMarkerClickListener {
-    override fun onMarkerClick(p0: Marker?): Boolean {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
 
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     //we used random ID integar value so we will know if permission is granted than we will be changing the value
     val PERMISSION_ID = 1
+    // finding radius variable
+    var radius = 1.0;
+    //Boolean if assitant found or not
+    var aFound:Boolean = false
+    var aFoundID: String = ""
+    lateinit var mAssistantMarker : Marker
+
 
     //Declaring GeoFire
     var geofire : GeoFire? = null
     lateinit var mDatabase: DatabaseReference;
     var clongtidue = 1.0
     var clatitude = 1.0
-    
+
+
+
+    override fun onMarkerClick(p0: Marker?): Boolean {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    //Assistant Location function to assitant location for customer
+    private fun getAssistantLocation(){
+        //here we are creating listener after list of available assistant is found and who is working with custoemrs
+        //when Assistant is found we will move current assistant to working assistant table so he is no longer available
+        // so he is not available to any other custimer until he is done with current customer
+        var assistantRef: DatabaseReference = FirebaseDatabase.getInstance().getReference().child("AssistantWorking").child(aFoundID).child("l")
+        // where L has latitude and longitude of assistant because this how firebase store data
+        val postListner = object : ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                if(p0.exists()){
+                    //Everythinng on list from wverything from DataSnapshot
+                    var nMap = p0.getValue() as List<Any>
+                    var locationLat = 0.0
+                    var locationLng = 0.0
+
+                    //Declaring varaible for assitant found
+                    val mRequest: Button = findViewById (R.id.request);
+                    mRequest.setText("Assistant Found")
+                    if(nMap.get(0) != null){
+                        locationLat = nMap.get(0).toString().toDouble()
+                        locationLng = nMap.get(1).toString().toDouble()
+
+                    }
+                    if(nMap.get(1) != null){
+                        locationLng = nMap.get(1).toString().toDouble()
+
+                    }
+                    //Now we will add Marker for Assitant to show customer where close by Assistant is Available
+                    var assitantLatn = LatLng(locationLat,locationLng)
+                    //we will remove the marker becuase we do not want so much marker all over the map once know the assistant location
+                    //After showing the assistant location we will remove the marker
+                    if(mAssistantMarker != null){
+                        mAssistantMarker.remove()
+
+                    }else{
+                        mAssistantMarker = map.addMarker(MarkerOptions().position(assitantLatn).title("Your Assistant Location Who is coming"))
+                    }
+
+                }
+            }
+
+
+        }
+        assistantRef.addValueEventListener(postListner)
+    }
+
+
+
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_customer_map)
@@ -71,6 +140,7 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
         })
         //Declaring varaible for customer request
         val mRequest: Button = findViewById (R.id.request);
+
         //Setting up Request button so custoemr can request Assistant
         mRequest.setOnClickListener(View.OnClickListener {
             val user = FirebaseAuth.getInstance().currentUser
@@ -89,7 +159,79 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
             //knows that we searching for near by assistant for you
             mRequest.setText("Requesting your Assistant, Please Wait")
 
+            //Calling function to get closer Assistant available to Customer
+            getCloserAssistant();
+
+
         })
+
+    }
+
+    //Finding closer Assistant for Customer
+    private fun getCloserAssistant(){
+
+        var aLocation: DatabaseReference = FirebaseDatabase.getInstance().getReference().child("AssistantAvailable")
+        var driverLocation = LatLng(clongtidue,clongtidue)
+        var geofire:GeoFire = GeoFire(aLocation)
+        var goQuery : GeoQuery = geofire.queryAtLocation(GeoLocation(driverLocation.latitude,driverLocation.longitude),radius)
+        val gopostListner = object :GeoQueryEventListener{
+            override fun onGeoQueryReady() {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                //when all available near assistant found within same radius we will call this function
+                //we will see if assistant found within customer radius otherwise we will increase the radius to find more assistant
+                if(!aFound){
+                    radius++
+                    getCloserAssistant();
+                }
+            }
+
+            override fun onKeyEntered(key: String?, location: GeoLocation?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                //Anytime assistant found by  nearby radius this funtion will call and provide id of assistant and location
+                // if nearby assistant found we will make this varaiable true
+                if(!aFound) {
+                    aFound = true
+                    //Toast.makeText(this, "Assistant Found and He is on his Way", Toast.LENGTH_LONG).show()
+                    if (key != null) {
+                        aFoundID = key
+
+                        var assistantRef: DatabaseReference =
+                            FirebaseDatabase.getInstance().getReference().child("Users")
+                                .child("Assistant").child(aFoundID)
+                        val uCustomerId = FirebaseAuth.getInstance().currentUser?.uid
+                        val map: HashMap<String, Any>
+                        uCustomerId?.let { map.put("CustomerRideId", it) }
+                        assistantRef.updateChildren(map as Map<String, Any>)
+
+                        //we will get driver location for customer
+                        getAssistantLocation()
+                        val mRequest: Button = findViewById (R.id.request);
+
+                        mRequest.setText("Looking for Assistant Location")
+
+
+                    };
+                }
+            }
+
+            override fun onKeyMoved(key: String?, location: GeoLocation?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onKeyExited(key: String?) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onGeoQueryError(error: DatabaseError?) {
+
+            }
+
+        }
+
+        goQuery.addGeoQueryEventListener(gopostListner)
+        goQuery.removeAllListeners()
+
 
     }
     /**
@@ -138,7 +280,7 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
                         map.isMyLocationEnabled = true
                         //map.addMarker(MarkerOptions().position(regina).title("My Favorite City"))
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(regina, 12.0f))
-                        Toast.makeText(this, location.latitude.toString() + location.longitude.toString(), Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, clatitude.toString() + clongtidue, Toast.LENGTH_LONG).show()
 
                     }
                 }
