@@ -3,8 +3,6 @@ package com.example.heyalizah
 import android.Manifest
 import android.content.Intent
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.firebase.geofire.GeoFire
 import com.firebase.geofire.GeoLocation
 import com.firebase.geofire.GeoQuery
@@ -31,6 +29,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.firebase.database.*
 import com.google.protobuf.DescriptorProtos
 
 class AssistantMapActivity : AppCompatActivity(), OnMapReadyCallback,
@@ -50,6 +49,12 @@ class AssistantMapActivity : AppCompatActivity(), OnMapReadyCallback,
     lateinit var mDatabase: DatabaseReference;
     var clongtidue = 1.0
     var clatitude = 1.0
+
+    //Now we will get customer ID to assistant so can reach at his location
+    lateinit var customerId : String
+    lateinit var mCustomerMarker : Marker
+
+
 
 
 
@@ -80,7 +85,69 @@ class AssistantMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
         })
 
+        getAssinedCustomer();
+
     }
+    //Getting Customer info to Assistant such as customer location and their Customer ID
+    private fun getAssinedCustomer(){
+        val assistantId  = FirebaseAuth.getInstance().currentUser?.uid
+        var customerRef: DatabaseReference = FirebaseDatabase.getInstance().getReference().child("Users")
+                .child("Assistant").child(assistantId.toString()).child("customerRideId")
+        customerRef.addValueEventListener(object:ValueEventListener{
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                if (dataSnapshot.exists()) {
+                        customerId = dataSnapshot.getValue().toString()
+                        //Here we will Assistant know where is customer location to go
+                        getAssinedCustomerPickupLocation();
+                    }
+                }
+
+        })
+    }
+    //Function implementation for getting customer info such as pick up location, their Customer ID
+    private fun getAssinedCustomerPickupLocation(){
+        //val assistantId = FirebaseAuth.getInstance().currentUser?.uid
+        var assignedCustomerPickupLocation: DatabaseReference = FirebaseDatabase.getInstance().getReference().child("CustomerRequest").child(customerId).child("l")
+        var postlistner = object : ValueEventListener {
+            override fun onCancelled(p0: DatabaseError) {
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onDataChange(p0: DataSnapshot) {
+                //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                if (p0.exists()) {
+                    //Everythinng on list from wverything from DataSnapshot
+                    var nMap = p0.getValue() as List<Any>
+                    var locationLat = 0.0
+                    var locationLng = 0.0
+
+                    //Declaring varaible for assitant found
+                    var mRequest: Button = findViewById(R.id.request);
+                    mRequest.setText("Assistant Found")
+                    if (nMap.get(0) != null) {
+                        locationLat = nMap.get(0).toString().toDouble()
+                        locationLng = nMap.get(1).toString().toDouble()
+
+                    }
+                    if (nMap.get(1) != null) {
+                        locationLng = nMap.get(1).toString().toDouble()
+
+                    }
+                    //Now we will add Marker for Assitant to show customer where close by Assistant is Available
+                    var assitantLatn = LatLng(locationLat, locationLng)
+                    //we will remove the marker becuase we do not want so much marker all over the map once know the assistant location
+                    //After showing the assistant location we will remove the marker
+                    mCustomerMarker = map.addMarker(MarkerOptions().position(assitantLatn).title("Customer's Pickup Location"))
+                }
+            }
+        }
+            assignedCustomerPickupLocation.addValueEventListener(postlistner);
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -124,7 +191,11 @@ class AssistantMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
 
                         val regina = LatLng(clatitude,clongtidue)  // this is regina
-                        map.addMarker(MarkerOptions().position(regina).title("My Favorite City"))
+                        map.mapType = GoogleMap.MAP_TYPE_TERRAIN
+                        //This is will draw a blue dot on Assistant current Location
+                        map.isMyLocationEnabled = true
+
+                        //map.addMarker(MarkerOptions().position(regina).title("My Favorite City"))
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(regina, 12.0f))
                         Toast.makeText(this, location.latitude.toString() + location.longitude.toString(), Toast.LENGTH_LONG).show()
 

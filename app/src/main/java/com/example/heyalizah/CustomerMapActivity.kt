@@ -56,7 +56,8 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
     lateinit var mDatabase: DatabaseReference;
     var clongtidue = 1.0
     var clatitude = 1.0
-
+    var pLocationLat = 1.0
+    var pLocationLon = 1.0
 
 
     override fun onMarkerClick(p0: Marker?): Boolean {
@@ -69,56 +70,61 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
         //when Assistant is found we will move current assistant to working assistant table so he is no longer available
         // so he is not available to any other custimer until he is done with current customer
         var assistantRef: DatabaseReference = FirebaseDatabase.getInstance().getReference().child("AssistantWorking").child(aFoundID).child("l")
+
+
         // where L has latitude and longitude of assistant because this how firebase store data
-        val postListner = object : ValueEventListener{
+        assistantRef.addValueEventListener(object : ValueEventListener{
             override fun onCancelled(p0: DatabaseError) {
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-
             }
 
-            override fun onDataChange(p0: DataSnapshot) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                if(p0.exists()){
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+
+                if(dataSnapshot.exists()) {
                     //Everythinng on list from wverything from DataSnapshot
-                    var nMap = p0.getValue() as List<Any>
+                    var nMap = dataSnapshot.getValue() as List<Any>
                     var locationLat = 0.0
                     var locationLng = 0.0
 
                     //Declaring varaible for assitant found
-                    val mRequest: Button = findViewById (R.id.request);
+                    val mRequest: Button = findViewById(R.id.request);
                     mRequest.setText("Assistant Found")
-                    if(nMap.get(0) != null){
+                    if (nMap.get(0) != null) {
                         locationLat = nMap.get(0).toString().toDouble()
                         locationLng = nMap.get(1).toString().toDouble()
 
                     }
-                    if(nMap.get(1) != null){
+                    if (nMap.get(1) != null) {
                         locationLng = nMap.get(1).toString().toDouble()
 
                     }
                     //Now we will add Marker for Assitant to show customer where close by Assistant is Available
-                    var assitantLatn = LatLng(locationLat,locationLng)
+                    var assitantLatn = LatLng(locationLat, locationLng)
                     //we will remove the marker becuase we do not want so much marker all over the map once know the assistant location
                     //After showing the assistant location we will remove the marker
-                    if(mAssistantMarker != null){
+                    if (mAssistantMarker != null) {
                         mAssistantMarker.remove()
 
-                    }else{
-                        mAssistantMarker = map.addMarker(MarkerOptions().position(assitantLatn).title("Your Assistant Location Who is coming"))
                     }
+                    lateinit var loc1 : Location
+                    loc1.latitude = pLocationLat
+                    loc1.longitude = pLocationLon
 
+                    lateinit var loc2 : Location
+                    loc2.latitude = locationLat
+                    loc2.longitude = locationLng
+
+                    //finding the distance between two location customeer and Assistant
+                    var distance = loc1.distanceTo(loc2)
+
+                    mRequest.setText("Assistant Found: " + distance.toString())
+                     mAssistantMarker =map.addMarker(MarkerOptions().position(assitantLatn).title("Your Assistant Location Who is coming"))
                 }
             }
 
 
-        }
-        assistantRef.addValueEventListener(postListner)
+        })
     }
-
-
-
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -152,9 +158,10 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
             //setting Customer latitude and longitude in database for pickup Request
             geofire!!.setLocation(uid,GeoLocation(clatitude,clongtidue))
             //Now will create marker for Pickup Location
-            val pickupLocation = LatLng(clatitude,clongtidue)
+            var pickupLocation = LatLng(clatitude,clongtidue)
             map.addMarker(MarkerOptions().position(pickupLocation).title("My Current Pickup Location"))
-
+            pLocationLat = pickupLocation.latitude
+            pLocationLon = pickupLocation.longitude
             // I am changing the text of Request Assistant to Requesting your Assistant. So the customer
             //knows that we searching for near by assistant for you
             mRequest.setText("Requesting your Assistant, Please Wait")
@@ -176,8 +183,7 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
         var goQuery : GeoQuery = geofire.queryAtLocation(GeoLocation(driverLocation.latitude,driverLocation.longitude),radius)
         val gopostListner = object :GeoQueryEventListener{
             override fun onGeoQueryReady() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
                 //when all available near assistant found within same radius we will call this function
                 //we will see if assistant found within customer radius otherwise we will increase the radius to find more assistant
                 if(!aFound){
@@ -187,7 +193,7 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
             }
 
             override fun onKeyEntered(key: String?, location: GeoLocation?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                 //Anytime assistant found by  nearby radius this funtion will call and provide id of assistant and location
                 // if nearby assistant found we will make this varaiable true
                 if(!aFound) {
@@ -278,6 +284,7 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
 
                         val regina = LatLng(clatitude,clongtidue)  // this is regina
                         map.isMyLocationEnabled = true
+                        map.mapType = GoogleMap.MAP_TYPE_TERRAIN
                         //map.addMarker(MarkerOptions().position(regina).title("My Favorite City"))
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(regina, 12.0f))
                         Toast.makeText(this, clatitude.toString() + clongtidue, Toast.LENGTH_LONG).show()
