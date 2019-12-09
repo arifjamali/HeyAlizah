@@ -181,9 +181,10 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
         var driverLocation = LatLng(clongtidue,clongtidue)
         var geofire:GeoFire = GeoFire(aLocation)
         var goQuery : GeoQuery = geofire.queryAtLocation(GeoLocation(driverLocation.latitude,driverLocation.longitude),radius)
-        val gopostListner = object :GeoQueryEventListener{
-            override fun onGeoQueryReady() {
 
+        goQuery.addGeoQueryEventListener(object: GeoQueryEventListener{
+            override fun onGeoQueryReady() {
+                //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                 //when all available near assistant found within same radius we will call this function
                 //we will see if assistant found within customer radius otherwise we will increase the radius to find more assistant
                 if(!aFound){
@@ -206,9 +207,10 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
                             FirebaseDatabase.getInstance().getReference().child("Users")
                                 .child("Assistant").child(aFoundID)
                         val uCustomerId = FirebaseAuth.getInstance().currentUser?.uid
-                        val map: HashMap<String, Any>
-                        uCustomerId?.let { map.put("CustomerRideId", it) }
-                        assistantRef.updateChildren(map as Map<String, Any>)
+                        var hashMap : HashMap<String, String>
+                                = HashMap<String, String> ()
+                        hashMap.put("CustomerRideId", uCustomerId.toString())
+                        assistantRef.updateChildren(hashMap as Map<String, Any>)
 
                         //we will get driver location for customer
                         getAssistantLocation()
@@ -230,12 +232,10 @@ class CustomerMapActivity : AppCompatActivity(), OnMapReadyCallback,
             }
 
             override fun onGeoQueryError(error: DatabaseError?) {
-
+                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
-        }
-
-        goQuery.addGeoQueryEventListener(gopostListner)
+        })
         goQuery.removeAllListeners()
 
 

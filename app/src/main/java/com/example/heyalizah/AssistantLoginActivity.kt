@@ -14,7 +14,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import java.lang.NullPointerException
 
-class Main2Activity : AppCompatActivity() {
+class AssistantLoginActivity : AppCompatActivity() {
     /*Firebase Reference */
     lateinit var mDatabase: DatabaseReference;
     val mAuth = FirebaseAuth.getInstance();

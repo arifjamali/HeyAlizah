@@ -42,7 +42,7 @@
             android:name=".AssistantMapActivity"
             android:label="@string/title_activity_assistant_map" >
         </activity>
-        <activity android:name=".Main2Activity" />
+        <activity android:name=".AssistantLoginActivity" />
         <activity android:name=".CustomerLoginActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

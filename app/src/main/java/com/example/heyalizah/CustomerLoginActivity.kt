@@ -54,7 +54,7 @@ class CustomerLoginActivity : AppCompatActivity() {
                         task ->
                     if(task.isSuccessful){
                         startActivity(Intent(this, CustomerMapActivity::class.java))
-                        Toast.makeText(this,"Sucesslly logged in: )", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this,"Successfully logged in: )", Toast.LENGTH_LONG).show();
                     }else{
                         Toast.makeText(this,"Invalid Username and Password: (", Toast.LENGTH_LONG).show();
 

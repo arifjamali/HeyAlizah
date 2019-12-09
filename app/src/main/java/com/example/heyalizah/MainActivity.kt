@@ -4,10 +4,6 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.content.Intent
-import kotlinx.android.synthetic.main.activity_main.*
-
-
-
 
 
 class MainActivity : AppCompatActivity() {
@@ -20,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         val mCustomer : Button = findViewById (R.id.customer);
 
         mAssistant.setOnClickListener {
-                val intent = Intent(this, Main2Activity::class.java)
+                val intent = Intent(this, AssistantLoginActivity::class.java)
                 startActivity(intent)
                 finish()
 
